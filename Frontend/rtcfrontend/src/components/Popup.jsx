@@ -12,11 +12,21 @@ import {
   Description,
 } from "@headlessui/react";
 
-function Popup({ showPopup, hidePopup }) {
-  // useEffect(() => {
-  //   console.log(show, "AVI");
-  //   setOpen(show);
-  // }, [show]);
+function Popup({ popup, hidePopup }) {
+  console.log(":AA,", popup);
+  const { showPopup, data } = popup;
+
+  const loginHandler = () => {
+    //TODO
+  };
+
+  const registerHandler = () => {
+    //TODO
+  };
+
+  const shareHandler = () => {
+    //TODO
+  };
 
   return (
     <Dialog
@@ -44,7 +54,7 @@ function Popup({ showPopup, hidePopup }) {
                     as="h3"
                     className=" font-semibold leading-6 text-gray-900 text-xl underline"
                   >
-                    Hi! Please Sign In
+                    Hi! {data.title}
                   </DialogTitle>
                   <div>
                     <div className="mt-2 w-full">
@@ -66,10 +76,11 @@ function Popup({ showPopup, hidePopup }) {
             </div>
             <div className="bg-gray-50 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6">
               <button
+                onClick={() => data.callback()}
                 type="button"
                 className="ml-2 mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
               >
-                Log In
+                {data.actionBtnText}
               </button>
               <button
                 type="button"
