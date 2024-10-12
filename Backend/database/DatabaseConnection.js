@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-class DatabaseConnection {
+module.exports = class DatabaseConnection {
   static async getConnection() {
     try {
       if (!mongoose.connection.readyState) {
@@ -13,6 +13,4 @@ class DatabaseConnection {
       throw ex;
     }
   }
-}
-
-export default DatabaseConnection;
+};

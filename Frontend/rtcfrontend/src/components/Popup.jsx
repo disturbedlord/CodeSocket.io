@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import { useState } from "react";
 import {
@@ -16,16 +16,16 @@ function Popup({ popup, hidePopup }) {
   console.log(":AA,", popup);
   const { showPopup, data } = popup;
 
-  const loginHandler = () => {
-    //TODO
-  };
+  const emailIdRef = useRef(null);
+  const pwdRef = useRef(null);
 
-  const registerHandler = () => {
-    //TODO
-  };
-
-  const shareHandler = () => {
-    //TODO
+  const HandleSubmit = () => {
+    console.log(data.title);
+    const userData = {
+      emailId: emailIdRef.current.value,
+      password: pwdRef.current.value,
+    };
+    data.callback(userData);
   };
 
   return (
@@ -59,12 +59,14 @@ function Popup({ popup, hidePopup }) {
                   <div>
                     <div className="mt-2 w-full">
                       <input
+                        ref={emailIdRef}
                         placeholder="Email Id"
                         className="w-full py-1 px-2 text-black border-gray-400 border-solid border-2 rounded-sm h-9"
                       />
                     </div>
                     <div className="mt-2 w-full">
                       <input
+                        ref={pwdRef}
                         placeholder="Pwd"
                         type="password"
                         className="w-full py-1 px-2 text-black border-gray-400 border-solid border-2 rounded-sm h-9"
@@ -76,7 +78,7 @@ function Popup({ popup, hidePopup }) {
             </div>
             <div className="bg-gray-50 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6">
               <button
-                onClick={() => data.callback()}
+                onClick={HandleSubmit}
                 type="button"
                 className="ml-2 mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
               >

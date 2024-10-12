@@ -3,23 +3,21 @@ import { CText } from "./Common/Tags";
 import { LuShare2 } from "react-icons/lu";
 import Popup from "./Popup";
 import { useState } from "react";
+import UserServices from "../services/UIServices/userServices";
+const _userService = new UserServices();
 
 const PopUpContents = {
   login: {
     title: "Please Log In",
     actionBtnText: "Log In",
     inputForms: [],
-    callback: () => {
-      console.log("Login");
-    },
+    callback: (data) => _userService.loginService(data),
   },
   register: {
     title: "Please Register",
     actionBtnText: "Register",
     inputForms: [],
-    callback: () => {
-      console.log("Register");
-    },
+    callback: (data) => _userService.registerService(data),
   },
   shareCode: {
     title: "Share the below code with you Friends",
