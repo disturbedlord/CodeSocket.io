@@ -4,6 +4,10 @@ const path = require("path");
 const users = require("./controller/Users");
 const bodyParser = require("body-parser");
 const server = express();
+const socket = require("socket.io");
+const http = require("http");
+const codeServer = http.createServer(server);
+const socketCode = socket(codeServer);
 
 // server.use(cookieParser());
 server.use(bodyParser.json());
@@ -22,6 +26,10 @@ server.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname + "/../Frontend/rtcfrontend/dist"));
 });
 
-server.listen("3000", () => {
-  console.log(`Example app listening on port ${3000}`);
+socketCode.on("connection", (socket) => {
+  console.log("User Connected");
+});
+
+codeServer.listen("3000", () => {
+  console.log(`Example app1 listening on port ${3000}`);
 });

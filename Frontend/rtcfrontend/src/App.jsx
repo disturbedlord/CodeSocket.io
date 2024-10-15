@@ -1,16 +1,48 @@
-import Navbar from "./components/Navbar";
+import { PersistGate } from "redux-persist/integration/react";
+
 import "./App.css";
 import MEditor from "./components/MEditor";
 import Footer from "./components/Footer";
 import { Provider } from "react-redux";
-import { store } from "./services/reducers/rootReducer";
+import Store from "./services/reducers/rootReducer";
 import NavbarContainers from "./containers/NavbarContainers";
-import Popup from "./components/Popup";
-console.warn("Store: ", store);
+import { useEffect } from "react";
+import { socket } from "./components/Socket";
+console.warn("Store: ", Store.store);
 export default function App() {
+  const CheckSession = async () => {
+    console.log("Check Session : ", Store.store.getState().user);
+    const _store = await Store.store.getState();
+    if (
+      _store.user["tokenValidity"] === undefined ||
+      new Date(_store.user.tokenValidity) < new Date()
+    ) {
+      //await Store.persistor.purge();
+      Store.persistor.flush().then(() => {
+        console.log("Flush Complete");
+        return Store.persistor.purge();
+      });
+      console.log("Purge");
+    }
+  };
+
+  CheckSession();
+
+  useEffect(() => {
+    function onConnect() {
+      console.log("onConnect");
+    }
+    socket.on("connect", onConnect);
+    return () => {
+      socket.off("connect");
+    };
+  }, []);
+
   return (
-    <Provider store={store}>
-      <MainApp />
+    <Provider store={Store.store}>
+      <PersistGate loading={null} persistor={Store.persistor}>
+        <MainApp />
+      </PersistGate>
     </Provider>
   );
 }

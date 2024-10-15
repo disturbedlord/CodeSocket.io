@@ -1,27 +1,30 @@
 import axios from "axios";
 class UserServices {
   loginService = async (data) => {
-    await axios
+    let response = await axios
       .post("/users/login", {
         emailId: data.emailId,
         password: data.password,
       })
       .then((res) => {
-        console.log(res);
+        return res;
       })
-      .catch((ex) => console.log(ex));
+      .catch((ex) => ex.response);
+    return response;
   };
 
   registerService = async (data) => {
-    await axios
+    let response = await axios
       .post("/users/register", {
         emailId: data.emailId,
         password: data.password,
       })
       .then((res) => {
         console.log(res);
+        return res;
       })
-      .catch((ex) => console.log(ex));
+      .catch((ex) => ex.response);
+    return response;
   };
 }
 

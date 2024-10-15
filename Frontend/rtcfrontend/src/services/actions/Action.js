@@ -1,5 +1,15 @@
-import { is_Login } from "../constants";
+import { loginSuccess, logoutUser, setLoggedInUserDetails } from "../constants";
 
-export const isLogin = (data) => {
-  return { type: is_Login };
+export const loginSuccessAction = (data) => {
+  return { type: loginSuccess };
+};
+
+export const setLoggedInUserDetailsAction = (data) => {
+  return { type: setLoggedInUserDetails, data: data };
+};
+
+export const logoutUserAction = () => {
+  return {
+    type: logoutUser,
+  };
 };
