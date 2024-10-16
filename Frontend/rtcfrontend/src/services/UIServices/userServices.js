@@ -1,19 +1,25 @@
 import axios from "axios";
 class UserServices {
-  loginService = async (data) => {
+  static loginService = async (data) => {
     let response = await axios
       .post("/users/login", {
         emailId: data.emailId,
         password: data.password,
       })
       .then((res) => {
-        return res;
+        if (
+          res !== undefined &&
+          res.status === 200 &&
+          res.data.data !== undefined
+        ) {
+          return res;
+        }
       })
       .catch((ex) => ex.response);
     return response;
   };
 
-  registerService = async (data) => {
+  static registerService = async (data) => {
     let response = await axios
       .post("/users/register", {
         emailId: data.emailId,
@@ -25,6 +31,19 @@ class UserServices {
       })
       .catch((ex) => ex.response);
     return response;
+  };
+
+  static logoutService = async () => {
+    let logout = await axios
+      .delete("/users/logout")
+      .then((res) => {
+        if (res.status === 200) return true;
+      })
+      .catch((ex) => {
+        console.log("Logout Exception : ", ex);
+        return false;
+      });
+    return logout;
   };
 }
 

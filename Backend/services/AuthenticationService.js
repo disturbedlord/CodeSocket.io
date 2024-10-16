@@ -1,5 +1,5 @@
 const GenericRepository = require("../database/repository/GenericRepository");
-const UserModel = require("../database/model/user");
+const UserModel = require("../database/model/users");
 const Util = require("../util/utils");
 const jwt = require("jsonwebtoken");
 const ErrorResponse = require("../model/response/ErrorResponse");
@@ -71,6 +71,25 @@ module.exports = class AuthenticationService {
         return true;
       }
       return false;
+    } catch (ex) {
+      throw ex;
+    }
+  }
+
+  static verifyJWT(req, res, next) {
+    try {
+      let token = req.cookies.access_token;
+
+      if (!token) throw new ErrorResponse(401, "No token provided.", null);
+
+      jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err)
+          throw new ErrorResponse(500, "Failed to authenticate token.", null);
+
+        req.userId = decoded.id;
+
+        next();
+      });
     } catch (ex) {
       throw ex;
     }

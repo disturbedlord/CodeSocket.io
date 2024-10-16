@@ -20,4 +20,8 @@ module.exports = class Util {
       return false;
     }
   }
+
+  static expirationTime() {
+    return new Date(Date.now() + 1 * 3600000);
+  }
 };

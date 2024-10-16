@@ -20,3 +20,7 @@ export const Badge = (props) => {
     </span>
   );
 };
+
+export const CustomDiv = ({ text }) => {
+  return <div className="p-4 font-bold">{text}</div>;
+};

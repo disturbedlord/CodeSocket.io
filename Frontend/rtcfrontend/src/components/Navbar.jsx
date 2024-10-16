@@ -1,11 +1,13 @@
 import Colors from "./Common/Colors";
-import { CText } from "./Common/Tags";
+import { CText, CustomDiv } from "./Common/Tags";
 import { LuShare2 } from "react-icons/lu";
 import Popup from "./Popup";
 import { useState } from "react";
 import UserServices from "../services/UIServices/userServices";
-import LocalStorage from "../services/localStorageService";
-const _userService = new UserServices();
+import CodeServices from "../services/UIServices/codeServices";
+import { MdOutlineInsertLink } from "react-icons/md";
+import { FaUserAstronaut } from "react-icons/fa";
+import { IoLogOutOutline } from "react-icons/io5";
 
 function Navbar(props) {
   const [showPopUp, setShowPopUp] = useState({
@@ -19,43 +21,38 @@ function Navbar(props) {
 
   const PopUpContents = {
     login: {
+      type: "login",
       title: "Please Log In",
       actionBtnText: "Log In",
-      inputForms: [],
       callback: async (data) => {
-        const res = await _userService.loginService(data);
+        const res = await UserServices.loginService(data);
+        props.setLoggedInUserDetails(res.data);
         console.log("AVAV:", res);
-
-        if (
-          res !== undefined &&
-          res.status === 200 &&
-          res.data.data !== undefined
-        ) {
-          props.setLoggedInUserDetails(res.data);
-          console.log("AVAV:", res);
-        }
         return res;
       },
     },
     register: {
+      type: "register",
       title: "Please Register",
       actionBtnText: "Register",
-      inputForms: [],
-      callback: (data) => _userService.registerService(data),
+      callback: (data) => UserServices.registerService(data),
     },
     shareCode: {
+      type: "shareCode",
       title: "Share the below code with you Friends",
       actionBtnText: "Copy Code",
-      inputForms: [],
-      callback: () => {
-        console.log("Share");
-      },
+      callback: async () => await CodeServices.shareCode(),
+    },
+    joinRoom: {
+      type: "joinRoom",
+      title: "Please enter a Code to join a Room",
+      actionBtnText: "Join Room",
+      callback: (data) => {},
     },
   };
 
-  const LogoutUser = () => {
-    props.LogoutUser();
-  };
+  const LogoutUser = () =>
+    UserServices.logoutService().then(() => props.LogoutUser());
 
   console.warn("Props:", props);
   return (
@@ -67,11 +64,20 @@ function Navbar(props) {
         <button
           className="cursor-pointer flex flex-row items-center gap-1 underline"
           onClick={() =>
+            setShowPopUp({ showPopup: true, data: PopUpContents["joinRoom"] })
+          }
+        >
+          <MdOutlineInsertLink />
+          Enter Code
+        </button>
+        <button
+          className="cursor-pointer flex flex-row items-center gap-1 underline"
+          onClick={() =>
             setShowPopUp({ showPopup: true, data: PopUpContents["shareCode"] })
           }
         >
           <LuShare2 />
-          Code Share
+          Share
         </button>
         {props.user.loginSuccess ? (
           <UserDetails userData={props.user.userData} onLogout={LogoutUser} />
@@ -94,8 +100,15 @@ function Navbar(props) {
 const UserDetails = ({ userData, onLogout }) => {
   return (
     <>
-      <p className="cursor-pointer underline">{userData.Email}</p>
-      <button className="underline" onClick={onLogout}>
+      <p className="cursor-pointer underline flex flex-row items-center gap-1">
+        <FaUserAstronaut />
+        {userData.Email}
+      </p>
+      <button
+        className="cursor-pointer flex flex-row items-center gap-1 underline"
+        onClick={onLogout}
+      >
+        <IoLogOutOutline />
         Log Out
       </button>
     </>

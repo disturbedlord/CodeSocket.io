@@ -4,6 +4,7 @@ const router = express.Router();
 const authentication = require("../services/AuthenticationService");
 const SuccessResponse = require("../model/response/SuccessResponse");
 const ErrorResponse = require("../model/response/ErrorResponse");
+const Util = require("../util/utils");
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -11,7 +12,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 // Login an User
 router.post("/users/login", async (req, res, next) => {
   try {
-    console.log("Login Ca :", req);
+    console.log("Login Route:", req);
     const authenticationService = await authentication.init();
     const userData = await authenticationService.login(
       req.body.emailId,
@@ -20,7 +21,7 @@ router.post("/users/login", async (req, res, next) => {
 
     const token = await authenticationService.authenticateUser(userData);
     res.cookie("access_token", token, {
-      expires: new Date(Date.now() + 8 * 3600000),
+      expires: Util.expirationTime(),
       httpOnly: true,
     });
 
@@ -55,6 +56,13 @@ router.post("/users/register", async (req, res, next) => {
     console.log("Exception at Register Route : ", ex);
   }
   next();
+});
+
+//Logout the User
+router.delete("/users/logout", async (req, res) => {
+  res.cookie("access_token", { expires: Date.now() });
+  res.clearCookie("access_token");
+  res.status(200).json(new SuccessResponse(200, "Logout success!", null));
 });
 
 module.exports = router;

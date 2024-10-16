@@ -13,7 +13,7 @@ export default function userReducer(state = initialState, actions) {
     case setLoggedInUserDetails:
       return {
         ...state,
-        tokenValidity: new Date(Date.now() + 72000),
+        tokenValidity: new Date(Date.now() + 1 * 3600000),
         userData: {
           Email: actions.data.data.Email,
         },
