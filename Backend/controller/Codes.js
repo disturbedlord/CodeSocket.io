@@ -16,7 +16,7 @@ router.post(
   authentication.verifyJWT,
   async (req, res, next) => {
     try {
-      console.log("New Code:", req);
+      //console.log("New Code:", req);
       const codesService = await codeservice.init();
       const newCode = nanoid(10);
       const codePushed = await codesService.pushCodeToDB(newCode);
@@ -27,9 +27,31 @@ router.post(
             code: newCode,
           })
         );
+      } else {
+        throw "";
       }
     } catch (ex) {
-      res.status(400).json(new ErrorResponse(400, "Code cannot be generated"));
+      res.status(500).json(new ErrorResponse(500, "Internal Server Error"));
+    }
+    next();
+  }
+);
+
+//Validate Room Code
+router.get(
+  "/codes/validate/:code",
+  authentication.verifyJWT,
+  async (req, res, next) => {
+    try {
+      const roomCode = req.params.code;
+      const codeService = await codeservice.init();
+      const roomValid = await codeService.validateRoomCode(roomCode);
+      console.log("RoomValuid : ", roomValid.length);
+      if (roomValid.length > 0) {
+        res.status(200).json("Valid");
+      } else res.status(404).json("Invalid");
+    } catch (ex) {
+      res.status(500).json(new ErrorResponse(500, "Internal Server Error"));
     }
     next();
   }

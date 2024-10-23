@@ -4,29 +4,29 @@ import "./App.css";
 import MEditor from "./components/MEditor";
 import Footer from "./components/Footer";
 import { Provider } from "react-redux";
-import Store from "./services/reducers/rootReducer";
 import NavbarContainers from "./containers/NavbarContainers";
 import { useEffect } from "react";
 import { socket } from "./components/Socket";
-console.warn("Store: ", Store.store);
+import Store from "./services/reducers/rootReducer";
+import Home from "./components/Home";
 export default function App() {
-  const CheckSession = async () => {
-    console.log("Check Session : ", Store.store.getState().user);
-    const _store = await Store.store.getState();
-    if (
-      _store.user["tokenValidity"] === undefined ||
-      new Date(_store.user.tokenValidity) < new Date()
-    ) {
-      //await Store.persistor.purge();
-      Store.persistor.flush().then(() => {
-        console.log("Flush Complete");
-        return Store.persistor.purge();
-      });
-      console.log("Purge");
-    }
-  };
+  // const CheckSession = async () => {
+  //   console.log("Check Session : ", Store.store.getState().user);
+  //   const _store = await Store.store.getState();
+  //   if (
+  //     _store.user["tokenValidity"] === undefined ||
+  //     new Date(_store.user.tokenValidity) < new Date()
+  //   ) {
+  //     //await Store.persistor.purge();
+  //     Store.persistor.flush().then(() => {
+  //       console.log("Flush Complete");
+  //       return Store.persistor.purge();
+  //     });
+  //     console.log("Purge");
+  //   }
+  // };
 
-  CheckSession();
+  // CheckSession();
 
   useEffect(() => {
     function onConnect() {
@@ -41,18 +41,8 @@ export default function App() {
   return (
     <Provider store={Store.store}>
       <PersistGate loading={null} persistor={Store.persistor}>
-        <MainApp />
+        <Home />
       </PersistGate>
     </Provider>
   );
 }
-
-const MainApp = () => {
-  return (
-    <div className="full flex flex-col">
-      <NavbarContainers />
-      <MEditor />
-      <Footer />
-    </div>
-  );
-};

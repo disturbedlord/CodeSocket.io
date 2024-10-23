@@ -2,9 +2,8 @@ import axios from "axios";
 class CodeServices {
   static shareCode = async () => {
     let response = await axios
-      .post("/codes/newcode")
+      .post("http://localhost:3000/codes/newcode")
       .then((res) => {
-        console.log("Aa:", res);
         if (
           res !== undefined &&
           res.status === 200 &&
@@ -15,9 +14,26 @@ class CodeServices {
       })
       .catch((ex) => {
         console.log("ShareCode : ", ex);
-        return { code: "" };
+        return null;
       });
     return response;
+  };
+
+  static validateRoomCode = async (data) => {
+    try {
+      console.log("ValidateRoom : ", data);
+      const { code } = data;
+      let roomValid = await axios
+        .get(`http://localhost:3000/codes/validate/${code}`)
+        .then((res) => {
+          if (res.status === 200) return true;
+          return false;
+        });
+      return roomValid;
+    } catch (ex) {
+      console.log("Validate Room Code Exception: ", ex);
+      return false;
+    }
   };
 }
 

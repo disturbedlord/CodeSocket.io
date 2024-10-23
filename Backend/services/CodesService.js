@@ -19,4 +19,8 @@ module.exports = class CodesService {
       throw ex;
     }
   }
+
+  static validateRoomCode = async (code) => {
+    return await this.repository.find(CodesModel, { Code: code });
+  };
 };

@@ -26,28 +26,48 @@ function Popup({ popup, hidePopup }) {
 
   const emailIdRef = useRef(null);
   const pwdRef = useRef(null);
+  const roomRef = useRef(null);
 
-  const HandleSubmit = () => {
-    setLoading(true);
-    console.log(data.title);
-    const userData = {
-      emailId: emailIdRef.current.value,
-      password: pwdRef.current.value,
-    };
-    data.callback(userData).then((data) => {
-      console.log("popup : ", data);
-      setLoading(false);
-      if (data != undefined && data.status == 200) {
-        hidePopup();
-      } else {
-        setResponse({
-          responseComplete: true,
-          status: data.status,
-          message: data.data.message,
+  const HandleSubmit = (e) => {
+    e.preventDefault();
+    if (data.type === "joinRoom") {
+      setLoading(true);
+      const roomCode = roomRef.current.value;
+      if (roomCode.length > 0) {
+        data.callback({ code: roomCode }).then((res) => {
+          if (res) {
+            hidePopup();
+          } else {
+            setResponse({
+              responseComplete: true,
+              status: 404,
+              message: "Room Code is Invalid",
+            });
+          }
+          setLoading(false);
         });
-        // setError(data.data.message);
       }
-    });
+    } else if (data.type === "login" || data.type === "register") {
+      setLoading(true);
+      const userData = {
+        emailId: emailIdRef.current.value,
+        password: pwdRef.current.value,
+      };
+      data.callback(userData).then((data) => {
+        console.log("popup : ", data);
+        setLoading(false);
+        if (data != undefined && data.status == 200) {
+          hidePopup();
+        } else {
+          setResponse({
+            responseComplete: true,
+            status: data.status,
+            message: data.data.message,
+          });
+          // setError(data.data.message);
+        }
+      });
+    }
   };
 
   const closePopup = () => {
@@ -61,10 +81,18 @@ function Popup({ popup, hidePopup }) {
       console.log("Fetching new Share Code");
       setLoading(true);
       data.callback().then((res) => {
-        setLoading(false);
+        if (res) {
+          setLoading(false);
 
-        console.log(res["code"]);
-        setShareCode(res["code"] === "" ? "Error Fetching Code" : res["code"]);
+          console.log("AVVIA:", res["code"]);
+          setShareCode(
+            res["code"] === "" ? "Error Fetching Code" : res["code"]
+          );
+        } else {
+          setLoading(false);
+
+          setShareCode("Error Fetching Code");
+        }
       });
     }
   }, [data]);
@@ -82,7 +110,7 @@ function Popup({ popup, hidePopup }) {
             transition
             className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-sm  data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
           >
-            <form>
+            <form onSubmit={HandleSubmit}>
               <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 text-black">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
@@ -103,11 +131,12 @@ function Popup({ popup, hidePopup }) {
                         <div className="mt-2 w-full">
                           <input
                             required
-                            ref={emailIdRef}
-                            placeholder="Email Id"
+                            ref={roomRef}
+                            placeholder="Enter Room Code"
                             className="w-full py-1 px-2 text-black border-gray-400 border-solid border-2 rounded-sm h-9"
                           />
                         </div>
+                        <ResponseComponent response={response} />
                       </div>
                     )}
                     {data.type !== null &&
@@ -130,16 +159,7 @@ function Popup({ popup, hidePopup }) {
                               className="w-full py-1 px-2 text-black border-gray-400 border-solid border-2 rounded-sm h-9"
                             />
                           </div>
-                          {response != null && response.responseComplete && (
-                            <div className="mt-2 w-full">
-                              <Badge
-                                text={response.message}
-                                type={
-                                  response.status >= 400 ? "error" : "success"
-                                }
-                              />
-                            </div>
-                          )}
+                          <ResponseComponent response={response} />
                         </div>
                       )}
                   </div>
@@ -148,7 +168,6 @@ function Popup({ popup, hidePopup }) {
               <div className="bg-gray-50 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6">
                 {data.type !== "shareCode" ? (
                   <button
-                    onClick={HandleSubmit}
                     type="submit"
                     disabled={loading}
                     className="ml-2 mt-3 w-5 inline-flex justify-center rounded-md bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
@@ -174,6 +193,21 @@ function Popup({ popup, hidePopup }) {
   );
 }
 
+const ResponseComponent = ({ response }) => {
+  return (
+    <>
+      {response != null && response.responseComplete && (
+        <div className="mt-2 w-full">
+          <Badge
+            text={response.message}
+            type={response.status >= 400 ? "error" : "success"}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
 const Loader = () => {
   return (
     <div role="status" className="w-12 flex justify-center items-center">
@@ -193,7 +227,7 @@ const Loader = () => {
           fill="currentFill"
         />
       </svg>
-      <span class="sr-only">Loading...</span>
+      <span className="sr-only">Loading...</span>
     </div>
   );
 };

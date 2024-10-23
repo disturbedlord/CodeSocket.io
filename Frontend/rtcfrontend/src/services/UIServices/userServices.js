@@ -2,7 +2,7 @@ import axios from "axios";
 class UserServices {
   static loginService = async (data) => {
     let response = await axios
-      .post("/users/login", {
+      .post("http://localhost:3000/users/login", {
         emailId: data.emailId,
         password: data.password,
       })
@@ -21,7 +21,7 @@ class UserServices {
 
   static registerService = async (data) => {
     let response = await axios
-      .post("/users/register", {
+      .post("http://localhost:3000/users/register", {
         emailId: data.emailId,
         password: data.password,
       })
@@ -35,7 +35,7 @@ class UserServices {
 
   static logoutService = async () => {
     let logout = await axios
-      .delete("/users/logout")
+      .delete("http://localhost:3000/users/logout")
       .then((res) => {
         if (res.status === 200) return true;
       })

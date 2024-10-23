@@ -1,9 +1,24 @@
-import { loginSuccess, logoutUser, setLoggedInUserDetails } from "../constants";
+import {
+  getRoomCode,
+  joinRoom,
+  loginSuccess,
+  logoutUser,
+  resetUserStore,
+  setLoggedInUserDetails,
+} from "../constants";
 
 const initialState = {
   loginSuccess: false,
   userData: {},
   tokenValidity: null,
+  roomCode: null,
+};
+
+const defaultStore = {
+  loginSuccess: false,
+  userData: {},
+  tokenValidity: null,
+  roomCode: null,
 };
 
 export default function userReducer(state = initialState, actions) {
@@ -20,6 +35,13 @@ export default function userReducer(state = initialState, actions) {
       };
     case logoutUser:
       return { loginSuccess: false, userData: {} };
+    case joinRoom:
+      return { ...state, roomCode: actions.roomCode.code };
+    case resetUserStore:
+      return defaultStore;
+    case getRoomCode:
+      console.log("GET ROOM CODE CALLED");
+      return { ...state };
     default:
       return state;
   }

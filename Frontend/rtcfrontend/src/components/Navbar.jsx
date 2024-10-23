@@ -8,6 +8,7 @@ import CodeServices from "../services/UIServices/codeServices";
 import { MdOutlineInsertLink } from "react-icons/md";
 import { FaUserAstronaut } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
+import socketService from "../services/UIServices/socketServices";
 
 function Navbar(props) {
   const [showPopUp, setShowPopUp] = useState({
@@ -26,7 +27,12 @@ function Navbar(props) {
       actionBtnText: "Log In",
       callback: async (data) => {
         const res = await UserServices.loginService(data);
-        props.setLoggedInUserDetails(res.data);
+        if (res.status === 200) {
+          console.log("Status is 200");
+          props.setLoggedInUserDetails(res.data);
+        } else {
+          console.log("Not 200");
+        }
         console.log("AVAV:", res);
         return res;
       },
@@ -41,20 +47,57 @@ function Navbar(props) {
       type: "shareCode",
       title: "Share the below code with you Friends",
       actionBtnText: "Copy Code",
-      callback: async () => await CodeServices.shareCode(),
+      callback: async () =>
+        await CodeServices.shareCode()
+          .then((res) => {
+            if (res) {
+              //const data = { code: res };
+              props.joinRoom(res);
+              console.log("SERVER CALLED");
+              const serverData = {
+                code: res["code"],
+                from: "Server1",
+                userId: props.user.userData.Email,
+              };
+              console.log(":B:", serverData);
+
+              socketService.sendMessage("join-code", serverData);
+              return res;
+            } else return res;
+          })
+          .catch((ex) => {
+            return { code: "" };
+          }),
     },
     joinRoom: {
       type: "joinRoom",
       title: "Please enter a Code to join a Room",
       actionBtnText: "Join Room",
-      callback: (data) => {},
+      callback: async (data) =>
+        await CodeServices.validateRoomCode(data)
+          .then((res) => {
+            if (res) {
+              props.joinRoom(data);
+              console.log("CLIENT CALLED");
+              const clientData = {
+                code: data["code"],
+                from: "Client",
+                userId: props.user.userData.Email,
+              };
+              console.log(":A:", clientData);
+              socketService.sendMessage("join-code", clientData);
+
+              return true;
+            } else return false;
+          })
+          .catch((ex) => false),
+      // props.joinRoom(data),
     },
   };
 
   const LogoutUser = () =>
     UserServices.logoutService().then(() => props.LogoutUser());
 
-  console.warn("Props:", props);
   return (
     <div
       className={`w-full p-2 shadow-md bg-[${Colors.navbarBg}] flex flex-row justify-between`}
@@ -62,16 +105,18 @@ function Navbar(props) {
       <CText text={"codeSOCKET.IO"} size={"xl"} bold />
       <div className="flex flex-row gap-5 px-2 justify-center items-center">
         <button
-          className="cursor-pointer flex flex-row items-center gap-1 underline"
+          className="cursor-pointer flex flex-row items-center gap-1 "
           onClick={() =>
             setShowPopUp({ showPopup: true, data: PopUpContents["joinRoom"] })
           }
         >
           <MdOutlineInsertLink />
-          Enter Code
+          {props.user.roomCode
+            ? `Room Joined (${props.user.roomCode})`
+            : "Enter Code"}
         </button>
         <button
-          className="cursor-pointer flex flex-row items-center gap-1 underline"
+          className="cursor-pointer flex flex-row items-center gap-1 "
           onClick={() =>
             setShowPopUp({ showPopup: true, data: PopUpContents["shareCode"] })
           }
@@ -100,12 +145,12 @@ function Navbar(props) {
 const UserDetails = ({ userData, onLogout }) => {
   return (
     <>
-      <p className="cursor-pointer underline flex flex-row items-center gap-1">
+      <p className="cursor-pointer flex flex-row items-center gap-1">
         <FaUserAstronaut />
         {userData.Email}
       </p>
       <button
-        className="cursor-pointer flex flex-row items-center gap-1 underline"
+        className="cursor-pointer flex flex-row items-center gap-1 "
         onClick={onLogout}
       >
         <IoLogOutOutline />
@@ -119,13 +164,13 @@ const AuthButtons = ({ ShowPopUp }) => {
   return (
     <>
       <button
-        className="cursor-pointer underline"
+        className="cursor-pointer "
         onClick={() => ShowPopUp({ showPopup: true, data: "login" })}
       >
         Log In
       </button>
       <button
-        className="cursor-pointer underline"
+        className="cursor-pointer "
         onClick={() => ShowPopUp({ showPopup: true, data: "register" })}
       >
         Register
