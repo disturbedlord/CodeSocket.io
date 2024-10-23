@@ -1,25 +1,30 @@
 import { io } from "socket.io-client";
+class SocketService {
+  constructor() {
+    if (this.socket) {
+      throw new Error("Only One Socket Instance is Allowed!!!");
+    }
+    this.socket = io();
+  }
 
-class socketService {
-  static socket = io();
-
-  static sendMessage = (topic, payload) => {
+  sendMessage = (topic, payload) => {
     console.log("SocketService : pyaload : ", topic, payload);
-    socketService.socket.emit(topic, payload);
+    this.socket.emit(topic, payload);
   };
 
-  static getSocketConnection = () => {
-    return socketService.socket;
+  getSocketConnection = () => {
+    return this.socket;
   };
 
-  static disconnectTopic = (topic) => {
-    socketService.socket.off(topic);
+  disconnectTopic = (topic) => {
+    this.socket.off(topic);
   };
 
-  static disconnect = () => socketService.socket.disconnect();
+  disconnect = () => this.socket.disconnect();
 
-  static connectTopic = (topic, callback) =>
-    socketService.socket.on(topic, callback);
+  connectTopic = (topic, callback) => this.socket.on(topic, callback);
 }
 
-export default socketService;
+const singletonSocket = Object.freeze(new SocketService());
+
+export default singletonSocket;

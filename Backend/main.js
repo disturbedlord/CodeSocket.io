@@ -60,26 +60,32 @@ const socketCache = {
 };
 
 socketCode.on("connection", (socket) => {
-  //console.log("User Connected with Id: ", socket.id);
+  console.log("User Connected with Id: ", socket.id);
   // socket.join("U79z7-pBQj");
 
   socket.on("join-code", (roomCode) => {
     console.log("ROOM : ", roomCode);
-    const { room, from, userId } = roomCode;
+    const { code, from, userId } = roomCode;
     console.log("JOIN_CODE called from ", from, socket.id, userId);
     socket.leaveAll();
-    socket.join(room);
+    console.log("ROOMROOM: ", code);
+    socket.join(code);
     socketCache.sockets.userId = socket.id;
 
-    console.log("ALL CLIENTS : ", socket.adapter.rooms.get(room));
+    console.log("ALL CLIENTS : ", socket.adapter.rooms.get(code));
   });
 
   socket.on("code-change", (event) => {
     const { roomCode, data } = event;
     console.log("CODE_CHANGE:", roomCode, data, event, socket.id);
-    socket.join(event[0]);
+    console.warn("BEFORE: ", socket.adapter.rooms);
 
-    socket.broadcast.to(event[0]).emit("code-update", event[1]);
+    const response = {
+      message: event[1],
+      sender: socket.id,
+    };
+
+    socket.broadcast.to(event[0]).emit("code-change", response);
     console.log(
       "ALL CLIENTS CODECHANGE: ",
       socket.adapter.rooms.get(event[0]),

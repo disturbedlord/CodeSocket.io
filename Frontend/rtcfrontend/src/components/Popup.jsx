@@ -22,7 +22,7 @@ function Popup({ popup, hidePopup }) {
     message: "",
   });
   console.log("Popup : ", popup);
-  const { showPopup, data } = popup;
+  const { showPopup, data, popupData } = popup;
 
   const emailIdRef = useRef(null);
   const pwdRef = useRef(null);
@@ -34,6 +34,11 @@ function Popup({ popup, hidePopup }) {
       setLoading(true);
       const roomCode = roomRef.current.value;
       if (roomCode.length > 0) {
+        if (roomCode === popupData.code) {
+          hidePopup();
+          setLoading(false);
+          return;
+        }
         data.callback({ code: roomCode }).then((res) => {
           if (res) {
             hidePopup();
@@ -132,6 +137,7 @@ function Popup({ popup, hidePopup }) {
                           <input
                             required
                             ref={roomRef}
+                            defaultValue={popupData.code}
                             placeholder="Enter Room Code"
                             className="w-full py-1 px-2 text-black border-gray-400 border-solid border-2 rounded-sm h-9"
                           />

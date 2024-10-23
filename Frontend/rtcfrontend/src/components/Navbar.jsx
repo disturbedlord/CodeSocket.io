@@ -73,6 +73,7 @@ function Navbar(props) {
       type: "joinRoom",
       title: "Please enter a Code to join a Room",
       actionBtnText: "Join Room",
+      popupData: {},
       callback: async (data) =>
         await CodeServices.validateRoomCode(data)
           .then((res) => {
@@ -84,7 +85,6 @@ function Navbar(props) {
                 from: "Client",
                 userId: props.user.userData.Email,
               };
-              console.log(":A:", clientData);
               socketService.sendMessage("join-code", clientData);
 
               return true;
@@ -106,9 +106,17 @@ function Navbar(props) {
       <div className="flex flex-row gap-5 px-2 justify-center items-center">
         <button
           className="cursor-pointer flex flex-row items-center gap-1 "
-          onClick={() =>
-            setShowPopUp({ showPopup: true, data: PopUpContents["joinRoom"] })
-          }
+          onClick={() => {
+            const roomCode =
+              props && props.user && props.user.roomCode
+                ? props.user.roomCode
+                : "";
+            setShowPopUp({
+              showPopup: true,
+              data: PopUpContents["joinRoom"],
+              popupData: { code: roomCode },
+            });
+          }}
         >
           <MdOutlineInsertLink />
           {props.user.roomCode

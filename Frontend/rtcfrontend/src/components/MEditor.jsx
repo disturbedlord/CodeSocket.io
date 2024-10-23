@@ -59,17 +59,21 @@ class MEditor extends React.Component {
   }
 
   componentDidMount() {
-    socketService.connectTopic("code-update", (e) => {
-      console.log("CODEUPDATE12 : ", e);
-      this.editorRef.current.setValue(e);
+    socketService.connectTopic("code-change", (msg) => {
+      console.log("CODEUPDATE12 : ", msg, this.socket);
+      if (msg.sender !== this.socket.current.id) {
+        const currentPosition = this.editorRef.current.getPosition();
+        this.editorRef.current.setValue(msg.message);
+        this.editorRef.current.setPosition(currentPosition);
+      }
     });
   }
 
   componentDidUpdate() {
-    socketService.connectTopic("code-update", (e) => {
-      console.log("CODEUPDATE1 : ", e);
-      this.editorRef.current.setValue(e);
-    });
+    // socketService.connectTopic("code-update", (e) => {
+    //   console.log("CODEUPDATE1 : ", e);
+    //   this.editorRef.current.setValue(e);
+    // });
   }
 
   onEditorDidMount = (editor) => {
@@ -78,6 +82,7 @@ class MEditor extends React.Component {
     console.log(this.editorRef.current);
     editor.onKeyUp((e) => {
       console.log(editor.getValue(), this.props);
+      console.log("KEYUP");
       socketService.sendMessage("code-change", [
         this.props.user.roomCode,
         this.editorRef.current.getValue(),
