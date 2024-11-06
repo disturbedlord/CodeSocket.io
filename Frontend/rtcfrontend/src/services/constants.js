@@ -5,3 +5,6 @@ export const auth_Popup = "AUTH_POPUP";
 export const joinRoom = "JOIN_ROOM";
 export const resetUserStore = "RESET_USER_STORE";
 export const getRoomCode = "GET_ROOM_CODE";
+
+//EDITOR State Constants
+export const saveEditorValue = "SAVE_EDITOR";

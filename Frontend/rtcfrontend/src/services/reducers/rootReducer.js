@@ -14,9 +14,12 @@ import {
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import { AuthMiddleware } from "../../components/middleware/AuthMiddleware";
 import { LoggerMiddleware } from "../../components/middleware/LoggerMiddleware";
+import EditorReducer from "./editorReducer";
+import editorReducer from "./editorReducer";
 
 const rootReducer = combineReducers({
   user: userReducer,
+  editor: editorReducer,
 });
 
 const persistConfig = {
