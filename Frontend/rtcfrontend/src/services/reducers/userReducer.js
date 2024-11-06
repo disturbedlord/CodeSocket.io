@@ -38,7 +38,12 @@ export default function userReducer(state = initialState, actions) {
     case joinRoom:
       return { ...state, roomCode: actions.roomCode.code };
     case resetUserStore:
-      return defaultStore;
+      return {
+        loginSuccess: false,
+        userData: {},
+        tokenValidity: null,
+        roomCode: null,
+      };
     case getRoomCode:
       console.log("GET ROOM CODE CALLED");
       return { ...state };

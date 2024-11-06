@@ -1,3 +1,4 @@
+const randomColor = require("randomcolor");
 module.exports = class Util {
   /**
    * Init class
@@ -23,5 +24,9 @@ module.exports = class Util {
 
   static expirationTime() {
     return new Date(Date.now() + 1 * 3600000);
+  }
+
+  static getRandomColor() {
+    return randomColor();
   }
 };

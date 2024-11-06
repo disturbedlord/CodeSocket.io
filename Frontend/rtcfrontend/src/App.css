@@ -18,3 +18,25 @@ body , html {
   height: 100vh;
   width: 100vw;
 }
+
+.CursorDecoration1 {
+	color: #d65355 !important;
+	text-decoration: underline;
+	font-weight: bold;
+	font-style: oblique;
+}
+
+.CursorDecoration2 {
+	color: #2c9df9 !important;
+	text-decoration: underline;
+	font-weight: bold;
+	font-style: oblique;
+}
+
+.CursorDecoration3 {
+	color: #42c447 !important;
+	text-decoration: underline;
+	font-weight: bold;
+	font-style: oblique;
+}
+

@@ -12,7 +12,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 // Login an User
 router.post("/users/login", async (req, res, next) => {
   try {
-    console.log("Login Route:", req);
+    // console.log("Login Route:", req);
     const authenticationService = await authentication.init();
     const userData = await authenticationService.login(
       req.body.emailId,

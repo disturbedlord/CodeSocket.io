@@ -12,18 +12,12 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
-import {
-  AuthMiddleware,
-  loggerMiddleware,
-} from "../../components/middleware/AuthMiddleware";
+import { AuthMiddleware } from "../../components/middleware/AuthMiddleware";
+import { LoggerMiddleware } from "../../components/middleware/LoggerMiddleware";
 
 const rootReducer = combineReducers({
   user: userReducer,
 });
-
-// export const store = configureStore({
-//   reducer: rootReducer,
-// });
 
 const persistConfig = {
   key: "root",
@@ -32,17 +26,23 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-let store = configureStore(
-  {
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
-      }).concat(AuthMiddleware, loggerMiddleware),
-  }
-  // applyMiddleware(AuthMiddleware)
-);
+let store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [
+          "persist/PERSIST",
+          "persist/REHYDRATE",
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+        ],
+      },
+    }).concat(AuthMiddleware, LoggerMiddleware),
+});
 let persistor = persistStore(store);
 export default { store, persistor };

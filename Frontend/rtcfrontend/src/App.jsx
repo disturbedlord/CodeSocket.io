@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import { socket } from "./components/Socket";
 import Store from "./services/reducers/rootReducer";
 import Home from "./components/Home";
+import { isNull } from "./components/Common/Utility";
+import HomeContainer from "./containers/HomeContainer";
 export default function App() {
   // const CheckSession = async () => {
   //   console.log("Check Session : ", Store.store.getState().user);
@@ -32,6 +34,8 @@ export default function App() {
     function onConnect() {
       console.log("onConnect");
     }
+    console.log("REDUX POERSITI : ", Store.store.getState());
+    //Validate Auth Token on Page Refresh
     socket.on("connect", onConnect);
     return () => {
       socket.off("connect");
@@ -41,7 +45,7 @@ export default function App() {
   return (
     <Provider store={Store.store}>
       <PersistGate loading={null} persistor={Store.persistor}>
-        <Home />
+        <HomeContainer />
       </PersistGate>
     </Provider>
   );

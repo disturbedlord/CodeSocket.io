@@ -18,11 +18,17 @@ server.use(
   })
 );
 
-const socket1 = require("socket.io");
 const http = require("http");
 const codeServer = http.createServer(server);
-const socketCode = socket1(codeServer);
+const socketCode = require("socket.io")(codeServer, {
+  cors: {
+    origin: "*",
+  },
+});
+//const socketCode = socket1(codeServer);
 const cookieParser = require("cookie-parser");
+const { util } = require("./services/CodesService");
+const Util = require("./util/utils");
 server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
@@ -55,45 +61,141 @@ server.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname + "/../Frontend/rtcfrontend/dist"));
 });
 
-const socketCache = {
-  sockets: {},
+class Rooms {
+  client = class Client {
+    constructor(idx, ord) {
+      this.id = idx;
+      this.order = ord;
+      this.position = { lineNumber: 1, column: 2 };
+    }
+  };
+
+  constructor() {
+    this.rooms = {};
+  }
+}
+
+/*
+
+Rooms = {
+  this.rooms = {
+    roomCode: {
+      id: Client {
+        position: {lineNumber , column}
+      }
+    }
+  }
+}
+
+socketCache = {
+  roomCode1: {
+  id: {
+    position: {lineNumber: 1 , column: 2}
+    }
+    socket.id2,
+    socket.id3
+  ],
+  roomCode2: [
+  socket.id1
+}
+}
+*/
+const socketCache = {};
+const roomsObj = new Rooms();
+
+const joinRoom = (roomCode, socket) => {
+  console.log("SSOCKET : ", socket.adapter.rooms.get(roomCode));
+  if (
+    socket.adapter.rooms.get(roomCode) &&
+    socket.adapter.rooms.get(roomCode).size > 2
+  ) {
+    console.log(`${roomCode} already has 3 members`);
+  } else {
+    socket.leaveAll();
+    socket.join(roomCode);
+    console.log("SSOCKET1 : ", socketCache);
+
+    if (roomsObj.rooms[roomCode]) {
+      // Room Already Exist
+      roomsObj.rooms[roomCode][socket.id] = new roomsObj.client(
+        socket.id,
+        Object.keys(roomsObj.rooms[roomCode]).length + 1
+      );
+    } else {
+      roomsObj.rooms[roomCode] = {};
+      roomsObj.rooms[roomCode][socket.id] = new roomsObj.client(
+        socket.id,
+        Object.keys(roomsObj.rooms[roomCode]).length + 1
+      );
+    }
+
+    // if (roomCode in socketCache) {
+    //   if (!(socket.id in socketCache[roomCode])) {
+    //     socketCache[roomCode][socket.id] = {
+    //       position: { lineNumber: 1, column: 1 },
+    //     };
+    //   }
+    // } else {
+    //   socketCache[roomCode] = {};
+    //   socketCache[roomCode][socket.id] = {
+    //     position: { lineNumber: 1, column: 1 },
+    //   };
+    // }
+    console.log("SSOCKET1 : ", JSON.stringify(roomsObj));
+  }
 };
 
 socketCode.on("connection", (socket) => {
   console.log("User Connected with Id: ", socket.id);
-  // socket.join("U79z7-pBQj");
 
   socket.on("join-code", (roomCode) => {
     console.log("ROOM : ", roomCode);
-    const { code, from, userId } = roomCode;
-    console.log("JOIN_CODE called from ", from, socket.id, userId);
-    socket.leaveAll();
-    console.log("ROOMROOM: ", code);
-    socket.join(code);
-    socketCache.sockets.userId = socket.id;
-
-    console.log("ALL CLIENTS : ", socket.adapter.rooms.get(code));
+    const { code } = roomCode;
+    joinRoom(code, socket);
+    console.log("ALL CLIENTS : ", socket.adapter.rooms.get(roomCode.code));
   });
 
   socket.on("code-change", (event) => {
-    const { roomCode, data } = event;
-    console.log("CODE_CHANGE:", roomCode, data, event, socket.id);
+    const { roomCode, changeText, cursorPosition } = event;
+    console.log(
+      "CODE_CHANGE:",
+      roomCode,
+      changeText,
+      cursorPosition,
+      socket.id
+    );
     console.warn("BEFORE: ", socket.adapter.rooms);
+    const allMembers = socket.adapter.rooms.get(roomCode);
+    console.log(typeof allMembers, allMembers);
 
+    if (allMembers && !allMembers.has(socket.id)) {
+      joinRoom(roomCode, socket);
+    }
+
+    //update the cursor position
+    if (roomsObj.rooms[roomCode] && roomsObj.rooms[roomCode][socket.id])
+      roomsObj.rooms[roomCode][socket.id]["position"] = cursorPosition;
     const response = {
-      message: event[1],
+      message: changeText,
       sender: socket.id,
+      roomDetails: roomsObj.rooms[roomCode],
     };
 
-    socket.broadcast.to(event[0]).emit("code-change", response);
+    console.log("RES : ", response, response.roomDetails);
+
+    socket.broadcast.to(roomCode).emit("code-change", response);
     console.log(
       "ALL CLIENTS CODECHANGE: ",
-      socket.adapter.rooms.get(event[0]),
+      socket.adapter.rooms.get(roomCode),
       socketCache
     );
   });
+
+  socket.on("disconnect", () => {
+    socket.leaveAll();
+  });
 });
 
-codeServer.listen("3000", () => {
+codeServer.listen("3000", "localhost", () => {
   console.log(`Example app1 listening on port ${3000}`);
 });

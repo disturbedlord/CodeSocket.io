@@ -1,8 +1,10 @@
 import axios from "axios";
+import { BACKENDURL } from "../../components/Common/Constants";
+
 class CodeServices {
   static shareCode = async () => {
     let response = await axios
-      .post("http://localhost:3000/codes/newcode")
+      .post(BACKENDURL + "/codes/newcode")
       .then((res) => {
         if (
           res !== undefined &&
@@ -24,7 +26,7 @@ class CodeServices {
       console.log("ValidateRoom : ", data);
       const { code } = data;
       let roomValid = await axios
-        .get(`http://localhost:3000/codes/validate/${code}`)
+        .get(BACKENDURL + `/codes/validate/${code}`)
         .then((res) => {
           if (res.status === 200) return true;
           return false;

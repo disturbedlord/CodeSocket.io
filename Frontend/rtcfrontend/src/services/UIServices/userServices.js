@@ -1,8 +1,9 @@
 import axios from "axios";
+import { BACKENDURL } from "../../components/Common/Constants";
 class UserServices {
   static loginService = async (data) => {
     let response = await axios
-      .post("http://localhost:3000/users/login", {
+      .post(BACKENDURL + "/users/login", {
         emailId: data.emailId,
         password: data.password,
       })
@@ -21,7 +22,7 @@ class UserServices {
 
   static registerService = async (data) => {
     let response = await axios
-      .post("http://localhost:3000/users/register", {
+      .post(BACKENDURL + "/users/register", {
         emailId: data.emailId,
         password: data.password,
       })
@@ -35,7 +36,7 @@ class UserServices {
 
   static logoutService = async () => {
     let logout = await axios
-      .delete("http://localhost:3000/users/logout")
+      .delete(BACKENDURL + "/users/logout")
       .then((res) => {
         if (res.status === 200) return true;
       })
