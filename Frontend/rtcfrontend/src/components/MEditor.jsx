@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import "../app.css";
 import SocketService from "../services/UIServices/socketServices";
+import { isNull } from "./Common/Utility";
 
 class MEditor extends React.Component {
   constructor(props) {
@@ -85,6 +86,7 @@ class MEditor extends React.Component {
         changeText: this.editorRef.current.getValue(),
         cursorPosition: this.editorRef.current.getPosition(),
       });
+      this.props.saveEditorText(editor.getValue());
     });
     // editor.onMouseDown((e) => this.editorref.current.)
   };
@@ -96,7 +98,11 @@ class MEditor extends React.Component {
           key={"unique"}
           height={"90vh"}
           defaultLanguage="javascript"
-          defaultValue={`// the hello world program\nconsole.log('Welcome to codeSocket.io 🔥🔥');`}
+          defaultValue={
+            isNull(this.props.editor.value)
+              ? `// the hello world program\nconsole.log('Welcome to codeSocket.io 🔥🔥');`
+              : this.props.editor.value
+          }
           theme="vs-dark"
           onMount={this.onEditorDidMount}
           options={{
