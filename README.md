@@ -4,6 +4,13 @@
 
 This is a real-time web application designed to enable **collaborative coding** for multiple users, allowing them to work on code together in a shared environment. The app provides **code autocomplete** features to enhance productivity for a variety of programming languages including **C**, **C#**, **C++**, **Python**, **Java**, **JavaScript**, and **Node.js**. 
 
+## Preview
+
+![image](https://github.com/user-attachments/assets/f2b7be77-ef53-4fe3-9ce2-cb7dcd3367d7)
+![image](https://github.com/user-attachments/assets/cb87fe5f-0096-4d61-bba1-e4bc2105b091)
+
+
+
 ## Features
 
 - **Real-Time Collaborative Coding**: Multiple users can collaborate on the same code in real-time, allowing for seamless teamwork.
